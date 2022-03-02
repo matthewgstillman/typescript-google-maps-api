@@ -21,15 +21,13 @@ const Map: FC<IMap> = ({ mapType, mapTypeControl = false }) => {
   const [map, setMap] = useState<GoogleMap>();
   const [marker, setMarker] = useState<IMarker>();
   const [homeMarker, setHomeMarker] = useState<GoogleMarker>();
+  const [googleMarkers, setGoogleMarkers] = useState<GoogleMarker[]>([]);
 
   const startMap = (): void => {
     if (!map) {
       defaultMapStart();
     } else {
-      const homeLocation = new google.maps.LatLng(
-        40.77271882431875,
-        -111.85837957538665
-      );
+      const homeLocation = new google.maps.LatLng(40.7726828, -111.858323);
       setHomeMarker(addHomeMarker(homeLocation));
     }
   };
@@ -37,10 +35,7 @@ const Map: FC<IMap> = ({ mapType, mapTypeControl = false }) => {
   useEffect(startMap, [map]);
 
   const defaultMapStart = (): void => {
-    const defaultAddress = new google.maps.LatLng(
-      40.77271882431875,
-      -111.85837957538665
-    );
+    const defaultAddress = new google.maps.LatLng(40.7726828, -111.858323);
     initMap(20, defaultAddress);
   };
 
@@ -72,18 +67,32 @@ const Map: FC<IMap> = ({ mapType, mapTypeControl = false }) => {
     );
   };
 
-  const addSingleMarker = (): void => {
+  useEffect(() => {
     if (marker) {
       addMarker(new google.maps.LatLng(marker.latitude, marker.longitude));
     }
-  };
-  useEffect(addSingleMarker, [marker]);
+  }, [marker]);
 
   const addMarker = (location: GoogleLatLng): void => {
     const marker: GoogleMarker = new google.maps.Marker({
       position: location,
       map: map,
       icon: getIconAttributes("#000000"),
+    });
+    setGoogleMarkers((googleMarkers) => [...googleMarkers, marker]);
+
+    marker.addListener("click", () => {
+      const homePos = homeMarker?.getPosition();
+      const markerPos = marker?.getPosition();
+      if (homePos && markerPos) {
+        const distanceInMeters = google.maps.geometry.spherical.computeDistanceBetween(
+          homePos,
+          markerPos
+        );
+        console.log(`Distance in meters: ${distanceInMeters}`);
+      } else {
+        console.error(`Parameters are missing`);
+      }
     });
   };
 
@@ -97,7 +106,7 @@ const Map: FC<IMap> = ({ mapType, mapTypeControl = false }) => {
     homeMarkerConst.addListener("click", () => {
       if (map) {
         map.panTo(location);
-        map.setZoom(20);
+        map.setZoom(25);
         console.log("home marker clicked");
       }
     });
