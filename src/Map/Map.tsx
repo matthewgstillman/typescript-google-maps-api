@@ -82,8 +82,13 @@ const Map: FC<IMap> = ({ mapType, mapTypeControl = false }) => {
 
   const getIconAttributes = (iconColor: string) => {
     return {
-      path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-      scale: 10,
+      //Potentially add my own SVG file
+      path: google.maps.SymbolPath.CIRCLE,
+      fillColor: iconColor,
+      fillOpacity: 0.8,
+      strokeColor: "red",
+      strokeWeight: 2,
+      anchor: new google.maps.Point(30, 50),
     };
   };
 
