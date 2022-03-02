@@ -14,27 +14,34 @@ interface IMarker {
 
 type GoogleLatLng = google.maps.LatLng;
 type GoogleMap = google.maps.Map;
-type GoogleMarler = google.maps.Marker;
+type GoogleMarker = google.maps.Marker;
 
 const Map: FC<IMap> = ({ mapType, mapTypeControl = false }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<GoogleMap>();
   const [marker, setMarker] = useState<IMarker>();
+  const [homeMarker, setHomeMarker] = useState<GoogleMarker>();
 
   const startMap = (): void => {
     if (!map) {
       defaultMapStart();
-    }
-    if (map) {
-      console.log(map);
+    } else {
+      const homeLocation = new google.maps.LatLng(
+        40.77271882431875,
+        -111.85837957538665
+      );
+      setHomeMarker(addHomeMarker(homeLocation));
     }
   };
 
   useEffect(startMap, [map]);
 
   const defaultMapStart = (): void => {
-    const defaultAddress = new google.maps.LatLng(40.7726, -111.85843);
-    initMap(15, defaultAddress);
+    const defaultAddress = new google.maps.LatLng(
+      40.77271882431875,
+      -111.85837957538665
+    );
+    initMap(20, defaultAddress);
   };
 
   const initEventListener = (): void => {
@@ -73,11 +80,28 @@ const Map: FC<IMap> = ({ mapType, mapTypeControl = false }) => {
   useEffect(addSingleMarker, [marker]);
 
   const addMarker = (location: GoogleLatLng): void => {
-    const marker: google.maps.Marker = new google.maps.Marker({
+    const marker: GoogleMarker = new google.maps.Marker({
       position: location,
       map: map,
       icon: getIconAttributes("#000000"),
     });
+  };
+
+  const addHomeMarker = (location: GoogleLatLng): GoogleMarker => {
+    const homeMarkerConst: GoogleMarker = new google.maps.Marker({
+      position: location,
+      map: map,
+      // icon: {url: window.location.origin + "./assets/images/markerLocation.png",},
+      icon: getIconAttributes("#000000"),
+    });
+    homeMarkerConst.addListener("click", () => {
+      if (map) {
+        map.panTo(location);
+        map.setZoom(20);
+        console.log("home marker clicked");
+      }
+    });
+    return homeMarkerConst;
   };
 
   const getIconAttributes = (iconColor: string) => {
@@ -88,7 +112,7 @@ const Map: FC<IMap> = ({ mapType, mapTypeControl = false }) => {
       fillOpacity: 0.8,
       strokeColor: "red",
       strokeWeight: 2,
-      anchor: new google.maps.Point(30, 50),
+      anchor: new google.maps.Point(100, 100),
     };
   };
 
@@ -111,7 +135,7 @@ const Map: FC<IMap> = ({ mapType, mapTypeControl = false }) => {
 
   return (
     <div className="map-container">
-      <h1>Google Maps</h1>
+      <h1 className="header">Google Maps</h1>
       <div ref={ref} className="map-container__map"></div>
     </div>
   );
