@@ -70,6 +70,7 @@ const Map: FC<IMap> = ({ mapType, mapTypeControl = false }) => {
   useEffect(() => {
     if (marker) {
       addMarker(new google.maps.LatLng(marker.latitude, marker.longitude));
+      console.log(`Lat: ${marker.latitude}, Lng: ${marker.longitude}`);
     }
   }, [marker]);
 
@@ -77,7 +78,9 @@ const Map: FC<IMap> = ({ mapType, mapTypeControl = false }) => {
     const marker: GoogleMarker = new google.maps.Marker({
       position: location,
       map: map,
-      icon: getIconAttributes("#000000"),
+      icon: {
+        url: "http://maps.google.com/mapfiles/kml/paddle/ylw-blank.png",
+      },
     });
     setGoogleMarkers((googleMarkers) => [...googleMarkers, marker]);
 
@@ -101,7 +104,9 @@ const Map: FC<IMap> = ({ mapType, mapTypeControl = false }) => {
       position: location,
       map: map,
       // icon: {url: window.location.origin + "./assets/images/markerLocation.png",},
-      icon: getIconAttributes("#000000"),
+      icon: {
+        url: "http://maps.google.com/mapfiles/kml/paddle/red-stars.png",
+      },
     });
     homeMarkerConst.addListener("click", () => {
       if (map) {
